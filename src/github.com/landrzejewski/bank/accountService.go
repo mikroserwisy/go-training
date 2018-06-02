@@ -1,6 +1,9 @@
 package bank
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type AccountService interface {
 
@@ -64,16 +67,50 @@ func (service *AccountServiceLoggingProxy) CreateAccount() string {
 
 func (service *AccountServiceLoggingProxy) DepositFunds(number string, funds int) error {
 	result := service.Service.DepositFunds(number, funds)
-	fmt.Printf("Transaction: %v <- %v\n", number, funds)
+	fmt.Printf("%v <- %v\n", number, funds)
 	return result
 }
 
 func (service *AccountServiceLoggingProxy) WithdrawFunds(number string, funds int) error {
 	result := service.Service.WithdrawFunds(number, funds)
-	fmt.Printf("Transaction: %v -> %v\n", number, funds)
+	fmt.Printf("%v -> %v\n", number, funds)
 	return result
 }
 
 func (service *AccountServiceLoggingProxy) PrintReport() {
 	service.Service.PrintReport()
+}
+
+type AtomicAccountService struct {
+
+	Service AccountService
+	Mutex sync.RWMutex
+
+}
+
+func (service *AtomicAccountService) CreateAccount() string {
+	service.Mutex.Lock()
+	result := service.Service.CreateAccount()
+	service.Mutex.Unlock()
+	return result
+}
+
+func (service *AtomicAccountService) DepositFunds(number string, funds int) error {
+	service.Mutex.Lock()
+	result := service.Service.DepositFunds(number, funds)
+	service.Mutex.Unlock()
+	return result
+}
+
+func (service *AtomicAccountService) WithdrawFunds(number string, funds int) error {
+	service.Mutex.Lock()
+	result := service.Service.WithdrawFunds(number, funds)
+	service.Mutex.Unlock()
+	return result
+}
+
+func (service *AtomicAccountService) PrintReport() {
+	service.Mutex.RLock()
+	service.Service.PrintReport()
+	service.Mutex.RUnlock()
 }
