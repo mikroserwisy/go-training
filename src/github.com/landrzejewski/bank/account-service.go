@@ -17,28 +17,29 @@ type AccountService interface {
 
 }
 
-type AccountServiceDefault struct {
+type DefaultAccountService struct {
 
 	Repository AccountRepository
+
 	Generator AccountNumberGenerator
 
 }
 
-func (accountService *AccountServiceDefault) CreateAccount() string {
+func (accountService *DefaultAccountService) CreateAccount() string {
 	accountNumber := accountService.Generator.next()
 	accountService.Repository.save(&Account{Number:accountNumber})
 	return accountNumber
 }
 
-func (accountService *AccountServiceDefault) DepositFunds(number string, funds int) error {
+func (accountService *DefaultAccountService) DepositFunds(number string, funds int) error {
 	return accountService.process(number, func(account *Account) {account.deposit(funds)})
 }
 
-func (accountService *AccountServiceDefault) WithdrawFunds(number string, funds int) error {
+func (accountService *DefaultAccountService) WithdrawFunds(number string, funds int) error {
 	return accountService.process(number, func(account *Account) {account.withdraw(funds)})
 }
 
-func (accountService *AccountServiceDefault) process(number string, callback func(account *Account)) error {
+func (accountService *DefaultAccountService) process(number string, callback func(account *Account)) error {
 	account, err := accountService.Repository.getByNumber(number)
 	if err != nil {
 		return err
@@ -48,42 +49,43 @@ func (accountService *AccountServiceDefault) process(number string, callback fun
 	return nil
 }
 
-func (accountService *AccountServiceDefault) PrintReport() {
+func (accountService *DefaultAccountService) PrintReport() {
 	accounts, _ := accountService.Repository.getAll()
 	for _, account := range accounts {
 		fmt.Printf("%v: %v\n", account.Number, account.Balance)
 	}
 }
 
-type AccountServiceLoggingProxy struct {
+type LoggingAccountServiceLogging struct {
 
 	Service AccountService
 
 }
 
-func (service *AccountServiceLoggingProxy) CreateAccount() string {
+func (service *LoggingAccountServiceLogging) CreateAccount() string {
 	return service.Service.CreateAccount()
 }
 
-func (service *AccountServiceLoggingProxy) DepositFunds(number string, funds int) error {
+func (service *LoggingAccountServiceLogging) DepositFunds(number string, funds int) error {
 	result := service.Service.DepositFunds(number, funds)
 	fmt.Printf("%v <- %v\n", number, funds)
 	return result
 }
 
-func (service *AccountServiceLoggingProxy) WithdrawFunds(number string, funds int) error {
+func (service *LoggingAccountServiceLogging) WithdrawFunds(number string, funds int) error {
 	result := service.Service.WithdrawFunds(number, funds)
 	fmt.Printf("%v -> %v\n", number, funds)
 	return result
 }
 
-func (service *AccountServiceLoggingProxy) PrintReport() {
+func (service *LoggingAccountServiceLogging) PrintReport() {
 	service.Service.PrintReport()
 }
 
 type AtomicAccountService struct {
 
 	Service AccountService
+
 	Mutex sync.RWMutex
 
 }

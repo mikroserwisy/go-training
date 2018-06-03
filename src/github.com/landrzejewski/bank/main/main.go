@@ -57,17 +57,17 @@ func main() {
 	repository := bank.GormAccountsRepository{Db: db}
 
 	//generator := bank.IncrementalAccountNumberGenerator{}
-	//generator := bank.IncrementalDbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
-	generator := bank.IncrementalGormAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: db}
+	//generator := bank.DbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
+	generator := bank.GormAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: db}
 	generator.Refresh()
 
-	accountService := bank.AccountServiceDefault{Repository: &repository, Generator: &generator}
-	loggingProxyAccountService := bank.AccountServiceLoggingProxy{Service:&accountService}
+	accountService := bank.DefaultAccountService{Repository: &repository, Generator: &generator}
+	loggingAccountService := bank.LoggingAccountServiceLogging{Service:&accountService}
 	//atomicAccountService := bank.AtomicAccountService{Service: &loggingProxyAccountService, Mutex: sync.RWMutex{}}
 
-	accountNumber := loggingProxyAccountService.CreateAccount()
-	loggingProxyAccountService.DepositFunds(accountNumber, 1000)
-	loggingProxyAccountService.PrintReport()
+	accountNumber := loggingAccountService.CreateAccount()
+	loggingAccountService.DepositFunds(accountNumber, 1000)
+	loggingAccountService.PrintReport()
 
 	//group.Add(2)
 	//go deposit(accountNumber, &atomicAccountService)

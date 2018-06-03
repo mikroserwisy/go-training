@@ -24,7 +24,7 @@ func (generator *IncrementalAccountNumberGenerator) next() string {
 	return fmt.Sprintf("%026d", generator.counter)
 }
 
-type IncrementalDbAccountNumberGenerator struct {
+type DbAccountNumberGenerator struct {
 
 	Generator *IncrementalAccountNumberGenerator
 
@@ -32,18 +32,18 @@ type IncrementalDbAccountNumberGenerator struct {
 
 }
 
-func (generator *IncrementalDbAccountNumberGenerator) next() string {
+func (generator *DbAccountNumberGenerator) next() string {
 	return generator.Generator.next()
 }
 
-func (generator *IncrementalDbAccountNumberGenerator) Refresh()  {
+func (generator *DbAccountNumberGenerator) Refresh()  {
 	rows, _ := generator.Db.Query("select max(number) from account")
 	if rows.Next() {
 		rows.Scan(&generator.Generator.counter)
 	}
 }
 
-type IncrementalGormAccountNumberGenerator struct {
+type GormAccountNumberGenerator struct {
 
 	Generator *IncrementalAccountNumberGenerator
 
@@ -51,11 +51,11 @@ type IncrementalGormAccountNumberGenerator struct {
 
 }
 
-func (generator *IncrementalGormAccountNumberGenerator) next() string {
+func (generator *GormAccountNumberGenerator) next() string {
 	return generator.Generator.next()
 }
 
-func (generator *IncrementalGormAccountNumberGenerator) Refresh()  {
+func (generator *GormAccountNumberGenerator) Refresh()  {
 	account := Account{}
 	generator.Db.Last(&account)
 	generator.Generator.counter, _ = strconv.Atoi(account.Number)
