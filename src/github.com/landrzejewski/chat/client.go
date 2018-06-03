@@ -2,7 +2,6 @@ package chat
 
 import (
 	"bufio"
-	"net"
 	"log"
 	"io"
 	"fmt"
@@ -13,7 +12,6 @@ type client struct {
 	 room *room
 	 reader *bufio.Reader
 	 writer *bufio.Writer
-	 connection net.Conn
 }
 
 func (client *client) read() {
@@ -36,9 +34,4 @@ func (client *client) write(message message) {
 	messageText := fmt.Sprintf("%s: %s", message.sender.name, message.text)
 	client.writer.WriteString(messageText)
 	client.writer.Flush()
-}
-
-func (client *client) disconnect() {
-	client.connection.Close()
-	log.Printf("Disconnecting %v", client.name)
 }

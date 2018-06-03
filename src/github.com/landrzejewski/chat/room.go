@@ -13,7 +13,7 @@ type room struct {
 
 func (room *room) broadcast(message message) {
 	for _, client := range room.clients {
-		if client.connection != message.sender.connection {
+		if client.name != message.sender.name {
 			client.write(message)
 		}
 	}
@@ -23,11 +23,13 @@ func (room *room) add(client *client) {
 	room.clients = append(room.clients, client)
 }
 
-func (room *room) init() {
+func (room *room) start() {
 	for {
-		select {
+		message := <-room.channel
+		room.broadcast(message)
+		/*select {
 		case message := <-room.channel:
 			room.broadcast(message)
-		}
+		}*/
 	}
 }

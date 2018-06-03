@@ -37,7 +37,6 @@ func (server Server) createClient(room *room, connection net.Conn, userName stri
 		room: room,
 		reader: bufio.NewReader(connection),
 		writer: bufio.NewWriter(connection),
-		connection: connection,
 	}
 	go newClient.read()
 	return &newClient
@@ -49,6 +48,6 @@ func (server Server) createRoom(name string) *room {
 		channel: make(chan message),
 		clients: make([]*client, 0),
 	}
-	go newRoom.init()
+	go newRoom.start()
 	return &newRoom
 }
