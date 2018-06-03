@@ -26,7 +26,7 @@ type AccountServiceDefault struct {
 
 func (accountService *AccountServiceDefault) CreateAccount() string {
 	accountNumber := accountService.Generator.next()
-	accountService.Repository.save(&Account{number:accountNumber})
+	accountService.Repository.save(&Account{Number:accountNumber})
 	return accountNumber
 }
 
@@ -51,7 +51,7 @@ func (accountService *AccountServiceDefault) process(number string, callback fun
 func (accountService *AccountServiceDefault) PrintReport() {
 	accounts, _ := accountService.Repository.getAll()
 	for _, account := range accounts {
-		fmt.Printf("%v: %v\n", account.number, account.balance)
+		fmt.Printf("%v: %v\n", account.Number, account.Balance)
 	}
 }
 

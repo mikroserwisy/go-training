@@ -3,6 +3,8 @@ package bank
 import (
 	"fmt"
 	"database/sql"
+	"github.com/jinzhu/gorm"
+	"strconv"
 )
 
 type AccountNumberGenerator interface {
@@ -25,6 +27,7 @@ func (generator *IncrementalAccountNumberGenerator) next() string {
 type IncrementalDbAccountNumberGenerator struct {
 
 	Generator *IncrementalAccountNumberGenerator
+
 	Db sql.DB
 
 }
@@ -38,4 +41,22 @@ func (generator *IncrementalDbAccountNumberGenerator) Refresh()  {
 	if rows.Next() {
 		rows.Scan(&generator.Generator.counter)
 	}
+}
+
+type IncrementalGormAccountNumberGenerator struct {
+
+	Generator *IncrementalAccountNumberGenerator
+
+	Db *gorm.DB
+
+}
+
+func (generator *IncrementalGormAccountNumberGenerator) next() string {
+	return generator.Generator.next()
+}
+
+func (generator *IncrementalGormAccountNumberGenerator) Refresh()  {
+	account := Account{}
+	generator.Db.Last(&account)
+	generator.Generator.counter, _ = strconv.Atoi(account.Number)
 }

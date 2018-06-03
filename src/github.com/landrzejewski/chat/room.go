@@ -2,13 +2,21 @@ package chat
 
 import (
 	"net"
+	"github.com/jinzhu/gorm"
 )
 
 type room struct {
+
 	name     string
+
 	channel  chan message
+
 	clients  []*client
+
 	listener net.Listener
+
+	db *gorm.DB
+
 }
 
 func (room *room) broadcast(message message) {
@@ -27,6 +35,10 @@ func (room *room) start() {
 	for {
 		message := <-room.channel
 		room.broadcast(message)
+		room.db.Create(&chatMessage{
+			Text:message.text,
+			Sender: message.sender.name,
+		})
 		/*select {
 		case message := <-room.channel:
 			room.broadcast(message)

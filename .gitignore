@@ -1,6 +1,5 @@
 .idea
 bin
-go-sql-driver
 *.iml
 pkg
 

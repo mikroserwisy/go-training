@@ -1,16 +1,15 @@
 package bank
 
 type Account struct{
-	id int
-	number string
-	balance int
+	ID int `gorm:"AUTO_INCREMENT"`
+	Number string `gorm:"size:26"`
+	Balance int
 }
 
 func (account *Account) deposit(funds int) {
-	account.balance += funds
+	account.Balance += funds
 }
 
-
 func (account *Account) withdraw(funds int) {
-	account.balance -= funds
+	account.Balance -= funds
 }

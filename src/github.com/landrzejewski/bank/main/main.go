@@ -6,7 +6,8 @@ import (
 	"time"
 	"runtime"
 	_ "github.com/go-sql-driver/mysql"
-	"database/sql"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 var group sync.WaitGroup
@@ -38,11 +39,15 @@ func init()  {
 
 func main() {
 	//repository := bank.MapAccountRepository{Accounts: make(map[string]*bank.Account)}
-	db, _ := sql.Open("mysql", "root:admin@/go")
+	//db, _ := sql.Open("mysql", "root:admin@/go")
+	db := initDb()
+	db.LogMode(true)
 	defer db.Close()
-	repository := bank.DbAccountsRepository{Db: *db}
+	//repository := bank.DbAccountsRepository{Db: *db}
+	repository := bank.GormAccountsRepository{Db: db}
 	//generator := bank.IncrementalAccountNumberGenerator{}
-	generator := bank.IncrementalDbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
+	//generator := bank.IncrementalDbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
+	generator := bank.IncrementalGormAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: db}
 	generator.Refresh()
 	accountService := bank.AccountServiceDefault{Repository: &repository, Generator: &generator}
 	loggingProxyAccountService := bank.AccountServiceLoggingProxy{Service:&accountService}
@@ -60,4 +65,13 @@ func main() {
 	//group.Wait()
 
 	loggingProxyAccountService.PrintReport()
+}
+
+func initDb() *gorm.DB {
+	db, err := gorm.Open("mysql", "root:admin@/go")
+	if err != nil {
+		panic("failed to connect database")
+	}
+	db.AutoMigrate(&bank.Account{})
+	return db
 }
