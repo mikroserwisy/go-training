@@ -1,6 +1,9 @@
 package bank
 
-import "errors"
+import (
+	"errors"
+	"database/sql"
+)
 
 type AccountRepository interface {
 
@@ -43,4 +46,46 @@ func (repository *MapAccountRepository) getAll() ([]Account, error) {
 		accounts = append(accounts, *account)
 	}
 	return accounts, nil
+}
+
+type DbAccountsRepository struct {
+	Db sql.DB
+	Transaction *sql.Tx
+}
+
+func (repository *DbAccountsRepository) getByNumber(number string) (*Account, error) {
+	rows, err := repository.Db.Query("select * from account where number = ?", number)
+	account := Account{}
+	if rows.Next() {
+		err = rows.Scan(&account.id, &account.number, &account.balance)
+	} else {
+		return nil, errors.New("Not found")
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
+func (repository *DbAccountsRepository) save(account *Account) error {
+	stmt, _ := repository.Db.Prepare("insert into account values(null,?,?)")
+	_, err := stmt.Exec(account.number, account.balance)
+	return err
+}
+
+func (repository *DbAccountsRepository) update(account *Account) error {
+	stmt, _ := repository.Db.Prepare("update account set balance = ? where id = ?")
+	_, err := stmt.Exec(account.balance, account.id)
+	return err
+}
+
+func (repository *DbAccountsRepository) getAll() ([]Account, error)  {
+	rows, err := repository.Db.Query("select * from account")
+	accounts := make([]Account, 0)
+	for rows.Next() {
+		account := Account{}
+		err = rows.Scan(&account.id, &account.number, &account.balance)
+		accounts = append(accounts, account)
+	}
+	return accounts, err
 }

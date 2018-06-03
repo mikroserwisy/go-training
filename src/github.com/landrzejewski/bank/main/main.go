@@ -5,6 +5,8 @@ import (
 	"sync"
 	"time"
 	"runtime"
+	_ "github.com/go-sql-driver/mysql"
+	"database/sql"
 )
 
 var group sync.WaitGroup
@@ -35,20 +37,27 @@ func init()  {
 }
 
 func main() {
-	repository := bank.MapAccountRepository{Accounts: make(map[string]*bank.Account)}
-	generator := bank.InMemoryAccountNumberGenerator{}
+	//repository := bank.MapAccountRepository{Accounts: make(map[string]*bank.Account)}
+	db, _ := sql.Open("mysql", "root:admin@/go")
+	defer db.Close()
+	repository := bank.DbAccountsRepository{Db: *db}
+	//generator := bank.IncrementalAccountNumberGenerator{}
+	generator := bank.IncrementalDbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
+	generator.Refresh()
 	accountService := bank.AccountServiceDefault{Repository: &repository, Generator: &generator}
 	loggingProxyAccountService := bank.AccountServiceLoggingProxy{Service:&accountService}
-	atomicAccountService := bank.AtomicAccountService{Service: &loggingProxyAccountService, Mutex: sync.RWMutex{}}
+	//atomicAccountService := bank.AtomicAccountService{Service: &loggingProxyAccountService, Mutex: sync.RWMutex{}}
 
-	accountNumber := atomicAccountService.CreateAccount()
+	accountNumber := loggingProxyAccountService.CreateAccount()
 
-	group.Add(2)
+	loggingProxyAccountService.DepositFunds(accountNumber, 1090)
 
-	go deposit(accountNumber, &atomicAccountService)
-	go withdraw(accountNumber, &atomicAccountService)
+	//group.Add(2)
+	//
+	//go deposit(accountNumber, &atomicAccountService)
+	//go withdraw(accountNumber, &atomicAccountService)
+	//
+	//group.Wait()
 
-	group.Wait()
-
-	atomicAccountService.PrintReport()
+	loggingProxyAccountService.PrintReport()
 }
