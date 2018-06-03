@@ -37,36 +37,6 @@ func init()  {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-func main() {
-	//repository := bank.MapAccountRepository{Accounts: make(map[string]*bank.Account)}
-	//db, _ := sql.Open("mysql", "root:admin@/go")
-	db := initDb()
-	db.LogMode(true)
-	defer db.Close()
-	//repository := bank.DbAccountsRepository{Db: *db}
-	repository := bank.GormAccountsRepository{Db: db}
-	//generator := bank.IncrementalAccountNumberGenerator{}
-	//generator := bank.IncrementalDbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
-	generator := bank.IncrementalGormAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: db}
-	generator.Refresh()
-	accountService := bank.AccountServiceDefault{Repository: &repository, Generator: &generator}
-	loggingProxyAccountService := bank.AccountServiceLoggingProxy{Service:&accountService}
-	//atomicAccountService := bank.AtomicAccountService{Service: &loggingProxyAccountService, Mutex: sync.RWMutex{}}
-
-	accountNumber := loggingProxyAccountService.CreateAccount()
-
-	loggingProxyAccountService.DepositFunds(accountNumber, 1090)
-
-	//group.Add(2)
-	//
-	//go deposit(accountNumber, &atomicAccountService)
-	//go withdraw(accountNumber, &atomicAccountService)
-	//
-	//group.Wait()
-
-	loggingProxyAccountService.PrintReport()
-}
-
 func initDb() *gorm.DB {
 	db, err := gorm.Open("mysql", "root:admin@/go")
 	if err != nil {
@@ -74,4 +44,33 @@ func initDb() *gorm.DB {
 	}
 	db.AutoMigrate(&bank.Account{})
 	return db
+}
+
+func main() {
+	//db, _ := sql.Open("mysql", "root:admin@/go")
+	db := initDb()
+	db.LogMode(true)
+	defer db.Close()
+
+	//repository := bank.MapAccountRepository{Accounts: make(map[string]*bank.Account)}
+	//repository := bank.DbAccountsRepository{Db: *db}
+	repository := bank.GormAccountsRepository{Db: db}
+
+	//generator := bank.IncrementalAccountNumberGenerator{}
+	//generator := bank.IncrementalDbAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: *db}
+	generator := bank.IncrementalGormAccountNumberGenerator{Generator:&bank.IncrementalAccountNumberGenerator{}, Db: db}
+	generator.Refresh()
+
+	accountService := bank.AccountServiceDefault{Repository: &repository, Generator: &generator}
+	loggingProxyAccountService := bank.AccountServiceLoggingProxy{Service:&accountService}
+	//atomicAccountService := bank.AtomicAccountService{Service: &loggingProxyAccountService, Mutex: sync.RWMutex{}}
+
+	accountNumber := loggingProxyAccountService.CreateAccount()
+	loggingProxyAccountService.DepositFunds(accountNumber, 1000)
+	loggingProxyAccountService.PrintReport()
+
+	//group.Add(2)
+	//go deposit(accountNumber, &atomicAccountService)
+	//go withdraw(accountNumber, &atomicAccountService)
+	//group.Wait()
 }
