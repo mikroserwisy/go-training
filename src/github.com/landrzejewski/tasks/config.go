@@ -24,7 +24,7 @@ func DbMiddleware(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func getEngine() *gin.Engine{
+func initialize() (*gin.Engine, *gorm.DB) {
 	db := initDb()
 	engine := gin.Default()
 
@@ -33,6 +33,6 @@ func getEngine() *gin.Engine{
 	engine.Use(cors.New(config))*/
 
 	engine.Use(cors.Default(), location.Default(), DbMiddleware(db))
-	return engine
+	return engine, db
 }
 

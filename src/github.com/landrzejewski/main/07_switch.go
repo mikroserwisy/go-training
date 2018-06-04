@@ -12,7 +12,7 @@ func detectType(x interface{})  {
 	case int:
 		fmt.Println("int")
 	case user:
-		fmt.Println("user")
+		fmt.Println(x.(user).firstName)
 	default:
 		fmt.Println("unknown")
 	}

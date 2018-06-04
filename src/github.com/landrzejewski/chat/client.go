@@ -8,10 +8,15 @@ import (
 )
 
 type client struct {
+
 	 name string
+
 	 room *room
+
 	 reader *bufio.Reader
+
 	 writer *bufio.Writer
+
 }
 
 func (client *client) read() {
