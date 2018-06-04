@@ -66,6 +66,3 @@ func main() {
 	fmt.Println("Server started! Waiting for connections...")
 	listenForConnections(server)
 }
-
-
-
