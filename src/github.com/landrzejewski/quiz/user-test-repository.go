@@ -11,3 +11,9 @@ type UserTestRepository struct {
 func (repository *UserTestRepository) save(userTest *UserTest) {
 	repository.Db.Create(userTest)
 }
+
+func (repository *UserTestRepository) getByUserId(userId int) *UserTest {
+	userTest := UserTest{}
+	repository.Db.First(&userTest, "user_Id = ?", userId)
+	return &userTest
+}

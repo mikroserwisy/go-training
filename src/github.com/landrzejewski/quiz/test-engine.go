@@ -9,11 +9,20 @@ type TestEngine struct {
 }
 
 func (engine *TestEngine) StartTest(userId int) *Test  {
-	currentQuestionId := engine.Test.Questions[0].Id
-	userTest := UserTest{UserId: userId, CurrentQuestionId: currentQuestionId}
-	engine.UserTestRepository.save(&userTest)
+	engine.prepareUserTest(userId)
+	return engine.buildTestDefinition()
+}
 
+func (engine *TestEngine) prepareUserTest(userId int)  {
+	userTest := engine.UserTestRepository.getByUserId(userId)
+	if userTest.ID != 0 {
+		currentQuestionId := engine.Test.Questions[0].Id
+		userTest := UserTest{UserId: userId, CurrentQuestionId: currentQuestionId}
+		engine.UserTestRepository.save(&userTest)
+	}
+}
 
+func (engine *TestEngine) buildTestDefinition() *Test {
 	userQuestions := make([]*Question, len(engine.Test.Questions))
 	for _, question := range engine.Test.Questions {
 		userQuestion := Question{Id:question.Id, Text:question.Text, Answers:make([]*Answer,len(question.Answers)),
@@ -25,3 +34,4 @@ func (engine *TestEngine) StartTest(userId int) *Test  {
 	}
 	return &Test{Name:engine.Test.Name, TimeLimit:engine.Test.TimeLimit, Questions: userQuestions, Categories:engine.Test.Categories}
 }
+
