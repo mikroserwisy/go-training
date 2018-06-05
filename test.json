@@ -1,0 +1,29 @@
+{
+  "name": "Programming in go",
+  "timeLimit": 30000,
+  "categories": [
+    {
+      "id": 4,
+      "name": "Basics"
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "text": "How to build a program in go?",
+      "answers": [
+        {
+          "id": 2,
+          "text": "go build file.name",
+          "value": "1"
+        },
+        {
+          "id": 3,
+          "text": "go compile file.name",
+          "value": "0"
+        }
+      ],
+      "categoryId": 4
+    }
+  ]
+}
