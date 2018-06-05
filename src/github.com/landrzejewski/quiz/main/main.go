@@ -26,4 +26,5 @@ func main() {
 
 	spew.Dump(test)
 	spew.Dump(engine.StartTest(1))
+	engine.AnswerQuestion(1, &quiz.UserAnswer{QuestionId:1, Values:[]*quiz.UserAnswerValue{{Value: "1"}}})
 }

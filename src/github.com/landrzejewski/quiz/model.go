@@ -74,8 +74,6 @@ type UserAnswerValue struct {
 
 	gorm.Model
 
-	AnswerId int
-
 	Value string
 
 }
