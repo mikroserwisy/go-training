@@ -70,6 +70,8 @@ type UserAnswer struct {
 
 	UserTestID uint
 
+	Valid bool
+
 }
 
 type UserAnswerValue struct {

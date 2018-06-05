@@ -39,22 +39,41 @@ func (engine *TestEngine) buildTestDefinition() *Test {
 
 func (engine *TestEngine) AnswerQuestion(userId int, answer *UserAnswer) {
 	userTest := engine.UserTestRepository.getByUserId(userId)
-	if userTest.ID != 0 && userTest.Finished == false {
-		if engine.isTimeLeft(userTest) {
+	if engine.isActive(userTest) {
+		if engine.hasFinished(userTest) {
 			userTest.Finished = true
 		} else {
-			answerIndex := engine.indexOf(userTest, answer)
-			if answerIndex == -1 {
-				userTest.Answers = append(userTest.Answers, answer)
-			} else {
-				userTest.Answers[answerIndex] = answer
-			}
+			engine.addAnswer(userTest, answer)
 		}
 		engine.UserTestRepository.update(userTest)
 	}
 }
 
-func (engine *TestEngine) isTimeLeft(userTest *UserTest) bool {
+func (engine *TestEngine) isActive(userTest *UserTest) bool{
+	return userTest.ID != 0 && userTest.Finished == false
+}
+
+func (engine *TestEngine) addAnswer(userTest *UserTest, answer *UserAnswer) {
+	var question *Question
+	for _, currentQuestion := range engine.Test.Questions {
+		if currentQuestion.Id == answer.QuestionId {
+			question = currentQuestion
+			break
+		}
+	}
+	if question != nil {
+
+
+		answerIndex := engine.indexOf(userTest, answer)
+		if answerIndex == -1 {
+			userTest.Answers = append(userTest.Answers, answer)
+		} else {
+			userTest.Answers[answerIndex] = answer
+		}
+	}
+}
+
+func (engine *TestEngine) hasFinished(userTest *UserTest) bool {
 	return int(time.Since(userTest.CreatedAt).Seconds()) - engine.Test.TimeLimit >= 0
 }
 
@@ -67,4 +86,8 @@ func (engine *TestEngine) indexOf(userTest *UserTest, answer *UserAnswer) int {
 		}
 	}
 	return answerIndex
+}
+
+func (engine *TestEngine) generateReport(userId int) {
+
 }
