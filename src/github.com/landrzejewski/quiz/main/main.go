@@ -26,5 +26,5 @@ func main() {
 	engine := quiz.TestEngine{Test: test, UserTestRepository: &repository}
 	engine.StartTest(1)
 
-	engine.AnswerQuestion(1, &quiz.UserAnswer{QuestionId:1, Values:[]*quiz.UserAnswerValue{&quiz.UserAnswerValue{Value:"tetetet"}}})
+	engine.AnswerQuestion(1, &quiz.UserAnswer{QuestionId:1, Values:[]*quiz.UserAnswerValue{{Value:"1"},{Value:"0"}}})
 }

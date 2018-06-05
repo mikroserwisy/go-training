@@ -40,7 +40,7 @@ func (engine *TestEngine) buildTestDefinition() *Test {
 func (engine *TestEngine) AnswerQuestion(userId int, answer *UserAnswer) {
 	userTest := engine.UserTestRepository.getByUserId(userId)
 	if engine.isActive(userTest) {
-		if engine.hasFinished(userTest) {
+		if engine.shouldEnd(userTest) {
 			userTest.Finished = true
 		} else {
 			engine.addAnswer(userTest, answer)
@@ -62,8 +62,14 @@ func (engine *TestEngine) addAnswer(userTest *UserTest, answer *UserAnswer) {
 		}
 	}
 	if question != nil {
-
-
+		valid := true
+		for index := range question.Answers {
+			if question.Answers[index].Value != answer.Values[index].Value {
+				valid = false
+				break
+			}
+		}
+		answer.Valid = valid
 		answerIndex := engine.indexOf(userTest, answer)
 		if answerIndex == -1 {
 			userTest.Answers = append(userTest.Answers, answer)
@@ -73,7 +79,7 @@ func (engine *TestEngine) addAnswer(userTest *UserTest, answer *UserAnswer) {
 	}
 }
 
-func (engine *TestEngine) hasFinished(userTest *UserTest) bool {
+func (engine *TestEngine) shouldEnd(userTest *UserTest) bool {
 	return int(time.Since(userTest.CreatedAt).Seconds()) - engine.Test.TimeLimit >= 0
 }
 
