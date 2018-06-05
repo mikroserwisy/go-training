@@ -40,7 +40,7 @@ func (engine *TestEngine) buildTestDefinition() *Test {
 func (engine *TestEngine) AnswerQuestion(userId int, answer *UserAnswer) {
 	userTest := engine.UserTestRepository.getByUserId(userId)
 	if userTest.ID != 0 && userTest.Finished == false {
-		if int(time.Since(userTest.CreatedAt).Seconds()) - engine.Test.TimeLimit >= 0 {
+		if engine.isTimeLeft(userTest) {
 			userTest.Finished = true
 		} else {
 			answerIndex := engine.indexOf(userTest, answer)
@@ -54,7 +54,9 @@ func (engine *TestEngine) AnswerQuestion(userId int, answer *UserAnswer) {
 	}
 }
 
-
+func (engine *TestEngine) isTimeLeft(userTest *UserTest) bool {
+	return int(time.Since(userTest.CreatedAt).Seconds()) - engine.Test.TimeLimit >= 0
+}
 
 func (engine *TestEngine) indexOf(userTest *UserTest, answer *UserAnswer) int {
 	answerIndex := -1
