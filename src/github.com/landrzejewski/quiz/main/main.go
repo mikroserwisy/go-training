@@ -7,10 +7,10 @@ import (
 	"github.com/landrzejewski/quiz/common"
 )
 
-func parseData(bytes []byte) quiz.Test {
+func parseData(bytes []byte) *quiz.Test {
 	var test quiz.Test
 	common.PanicIfError(json.Unmarshal(bytes, &test))
-	return test
+	return &test
 }
 
 func main() {

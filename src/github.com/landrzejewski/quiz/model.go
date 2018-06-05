@@ -8,9 +8,9 @@ type Test struct {
 
 	TimeLimit int
 
-	Questions []Question
+	Questions []*Question
 
-	Categories []Category
+	Categories []*Category
 
 }
 
@@ -28,7 +28,7 @@ type Question struct {
 
 	Text string
 
-	Answers []Answer
+	Answers []*Answer
 
 	CategoryId int
 

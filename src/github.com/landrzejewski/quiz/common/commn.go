@@ -3,7 +3,6 @@ package common
 import (
 	"io/ioutil"
 	"github.com/jinzhu/gorm"
-	"github.com/landrzejewski/bank"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
@@ -24,6 +23,5 @@ func InitDb() *gorm.DB {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&bank.Account{})
 	return db
 }
