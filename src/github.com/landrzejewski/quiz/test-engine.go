@@ -14,7 +14,7 @@ func (engine *TestEngine) StartTest(userId int) Test  {
 	engine.UserTestRepository.save(&userTest)
 
 
-	questions := make([]*Question, len(engine.Test.Questions))
+	userQuestions := make([]*Question, len(engine.Test.Questions))
 	for _, question := range engine.Test.Questions {
 		userQuestion := Question{
 			Id:question.Id, Text:question.Text,
@@ -26,11 +26,12 @@ func (engine *TestEngine) StartTest(userId int) Test  {
 				Text:answer.Text,
 			})
 		}
+		userQuestions = append(userQuestions, &userQuestion)
 	}
 	return Test{
 		Name:engine.Test.Name,
 		TimeLimit:engine.Test.TimeLimit,
-		Questions: questions,
+		Questions: userQuestions,
 		Categories:engine.Test.Categories,
 		}
 }
