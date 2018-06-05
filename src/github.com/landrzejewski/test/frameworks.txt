@@ -1,0 +1,11 @@
+https://github.com/onsi/ginkgo
+https://github.com/franela/goblin
+https://github.com/stretchr/testify
+https://github.com/verdverm/frisby
+https://github.com/golang/mock
+
+https://github.com/sirupsen/logrus
+https://github.com/gizak/termui
+
+https://github.com/avelino/awesome-go
+https://blog.learngoprogramming.com/golang-const-type-enums-iota-bc4befd096d3
