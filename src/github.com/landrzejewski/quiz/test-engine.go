@@ -1,5 +1,7 @@
 package quiz
 
+import "time"
+
 type TestEngine struct {
 
 	Test *Test
@@ -37,16 +39,22 @@ func (engine *TestEngine) buildTestDefinition() *Test {
 
 func (engine *TestEngine) AnswerQuestion(userId int, answer *UserAnswer) {
 	userTest := engine.UserTestRepository.getByUserId(userId)
-	if userTest.ID != 0 {
-		answerIndex := engine.indexOf(userTest, answer)
-		if answerIndex == -1 {
-			userTest.Answers = append(userTest.Answers, answer)
+	if userTest.ID != 0 && userTest.Finished == false {
+		if int(time.Since(userTest.CreatedAt).Seconds()) - engine.Test.TimeLimit >= 0 {
+			userTest.Finished = true
 		} else {
-			userTest.Answers[answerIndex] = answer
+			answerIndex := engine.indexOf(userTest, answer)
+			if answerIndex == -1 {
+				userTest.Answers = append(userTest.Answers, answer)
+			} else {
+				userTest.Answers[answerIndex] = answer
+			}
 		}
 		engine.UserTestRepository.update(userTest)
 	}
 }
+
+
 
 func (engine *TestEngine) indexOf(userTest *UserTest, answer *UserAnswer) int {
 	answerIndex := -1

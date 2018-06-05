@@ -50,7 +50,7 @@ type UserTest struct {
 
 	gorm.Model
 
-	Done bool
+	Finished bool
 
 	UserId int
 

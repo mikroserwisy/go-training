@@ -1,6 +1,6 @@
 {
   "name": "Programming in go",
-  "timeLimit": 30000,
+  "timeLimit": 1,
   "categories": [
     {
       "id": 4,
