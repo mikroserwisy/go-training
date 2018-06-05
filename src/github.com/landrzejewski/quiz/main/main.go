@@ -24,5 +24,6 @@ func main() {
 	repository := quiz.UserTestRepository{Db: db}
 	engine := quiz.TestEngine{Test: test, UserTestRepository: &repository}
 
+	spew.Dump(test)
 	spew.Dump(engine.StartTest(1))
 }
