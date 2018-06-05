@@ -56,7 +56,7 @@ type UserTest struct {
 
 	CurrentQuestionId int
 
-	Answers []*UserAnswer
+	Answers []*UserAnswer `gorm:"foreignkey:user_test_id"`
 
 }
 
@@ -66,7 +66,9 @@ type UserAnswer struct {
 
 	QuestionId int
 
-	Values []*UserAnswerValue
+	Values []*UserAnswerValue `gorm:"foreignkey:user_answer_value_id"`
+
+	UserTestID uint
 
 }
 
@@ -75,5 +77,7 @@ type UserAnswerValue struct {
 	gorm.Model
 
 	Value string
+
+	UserAnswerValueID uint
 
 }

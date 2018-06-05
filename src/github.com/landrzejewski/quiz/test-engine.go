@@ -15,7 +15,7 @@ func (engine *TestEngine) StartTest(userId int) *Test  {
 
 func (engine *TestEngine) prepareUserTest(userId int)  {
 	userTest := engine.UserTestRepository.getByUserId(userId)
-	if userTest.ID != 0 {
+	if userTest.ID == 0 {
 		currentQuestionId := engine.Test.Questions[0].Id
 		userTest := UserTest{UserId: userId, CurrentQuestionId: currentQuestionId}
 		engine.UserTestRepository.save(&userTest)

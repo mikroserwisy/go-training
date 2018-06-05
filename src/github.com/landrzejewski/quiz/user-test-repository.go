@@ -19,5 +19,5 @@ func (repository *UserTestRepository) getByUserId(userId int) *UserTest {
 }
 
 func (repository *UserTestRepository) update(userTest *UserTest)  {
-	repository.Db.Model(&userTest).Update(userTest)
+	repository.Db.Save(userTest)
 }
