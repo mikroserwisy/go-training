@@ -23,9 +23,9 @@ func (engine *TestEngine) prepareUserTest(userId int)  {
 }
 
 func (engine *TestEngine) buildTestDefinition() *Test {
-	userQuestions := make([]*Question, len(engine.Test.Questions))
+	userQuestions := make([]*Question, 0)
 	for _, question := range engine.Test.Questions {
-		userQuestion := Question{Id:question.Id, Text:question.Text, Answers:make([]*Answer,len(question.Answers)),
+		userQuestion := Question{Id:question.Id, Text:question.Text, Answers:make([]*Answer,0),
 		}
 		for _, answer := range question.Answers {
 			userQuestion.Answers = append(userQuestion.Answers, &Answer{Id:answer.Id, Text:answer.Text})
